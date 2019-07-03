@@ -625,7 +625,7 @@ static char WEAPON_NAME_ARRAY[54][2][64] = {
 	, { "weapon_molotov", "Molotov" }
 	, { "weapon_incgrenade", "Incendiary Greande" }
 	, { "weapon_tagrenade", "Tactical Awareness Grenade" }
-	, { "weapon_healthshot", "Meid-Shot" }
+	, { "weapon_healthshot", "Medi-Shot" }
 	, { "weapon_snowball", "SnowBall" }
 	, { "weapon_hammer", "Hammer" }
 	, { "weapon_axe", "Axe" }
