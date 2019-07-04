@@ -124,7 +124,7 @@ methodmap Player {
      * 
      * @return                True if player is the SourceTV bot, false otherwise. 
      */ 
-    property bool IsSourceTV { 
+    property bool isSourceTV { 
         public get () { 
             return IsClientSourceTV ( this.index ); 
         } 
@@ -135,7 +135,7 @@ methodmap Player {
      * 
      * @return                True if player is the Replay bot, false otherwise. 
      */ 
-    property bool IsReplay { 
+    property bool isReplay { 
         public get () { 
             return IsClientReplay ( this.index ); 
         } 
@@ -146,7 +146,7 @@ methodmap Player {
      * 
      * @return                True if player is an observer, false otherwise. 
      */ 
-    property bool IsObserver { 
+    property bool isObserver { 
         public get () { 
             return IsClientObserver ( this.index ); 
         } 
@@ -263,14 +263,10 @@ methodmap Player {
 	 * @noreturn
 	 */
 	public void sendChat ( const char[] format, any ... ) {
-		if ( format[0] == EOS )
-			qufnrTools_PrintToChat ( this.index, "Hello World" );
-		else {
-			char buffer[254];
-			
-			VFormat ( buffer, sizeof buffer, format, 2 );
-			qufnrTools_PrintToChat ( this.index, buffer );
-		}
+		char buffer[254];
+		
+		VFormat ( buffer, sizeof buffer, format, 2 );
+		qufnrTools_PrintToChat ( this.index, buffer );
 	}
 	
 	/**
@@ -281,14 +277,10 @@ methodmap Player {
 	 * @noreturn
 	 */
 	public void sendReply ( const char[] format, any ... ) {
-		if ( format[0] == EOS )
-			qufnrTools_ReplyToCommand ( this.index, "Hello World" );
-		else {
-			char buffer[254];
-			
-			VFormat ( buffer, sizeof buffer, format, 2 );
-			qufnrTools_ReplyToCommand ( this.index, buffer );
-		}
+		char buffer[254];
+		
+		VFormat ( buffer, sizeof buffer, format, 2 );
+		qufnrTools_ReplyToCommand ( this.index, buffer );
 	}
 	
 	/**
@@ -299,15 +291,11 @@ methodmap Player {
 	 * @noreturn
 	 */
 	public void sendHintText ( const char[] format, any ... ) {
-		if ( format[0] == EOS )
-			PrintHintText ( this.index, "Hello World" );
-		else {
-			char buffer[254];
-			
-			SetGlobalTransTarget ( this.index );
-			VFormat ( buffer, sizeof buffer, format, 2 );
-			PrintHintText ( this.index, buffer );
-		}
+		char buffer[254];
+		
+		SetGlobalTransTarget ( this.index );
+		VFormat ( buffer, sizeof buffer, format, 2 );
+		PrintHintText ( this.index, buffer );
 	}
 	
 	/**
@@ -318,14 +306,10 @@ methodmap Player {
 	 * @noreturn
 	 */
 	public void sendCetnerText ( const char[] format, any ... ) {
-		if ( format[0] == EOS )
-			PrintCenterText ( this.index, "Hello World" );
-		else {
-			char buffer[254];
-			
-			SetGlobalTransTarget ( this.index );
-			VFormat ( buffer, sizeof buffer, format, 2 );
-			PrintCenterText ( this.index, buffer );
-		}
+		char buffer[254];
+		
+		SetGlobalTransTarget ( this.index );
+		VFormat ( buffer, sizeof buffer, format, 2 );
+		PrintCenterText ( this.index, buffer );
 	}
 };
