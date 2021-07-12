@@ -3,9 +3,12 @@
 #endif
 #define	_qufnrtools_included
 
-#include <loringlib>
-#include "include/qufnrTools/player.inc"
-#include "include/qufnrTools/menu.inc"
+#include <sdktools>
+#include <sdkhooks>
+#include <cstrike>
+
+
+#define		MAX_ENTITIES	
 
 /**
  * @section	색상에 사용되는 값
@@ -37,6 +40,107 @@ static char g_strEscapeSequence[4][2][32] = {
 	, { "{return}", "\r" }
 };
 
+enum WaterLevel {
+	WATER_LEVEL_NOT_IN_WATER = 0,
+	WATER_LEVEL_FEET_IN_WATER,
+	WATER_LEVEL_WAIST_IN_WATER,
+	WATER_LEVEL_HEAD_IN_WATER
+};
+
+enum __CollisionGroup_t {
+	CollisionGroup_None = 0,
+	CollisionGroup_Debris,
+	CollisionGroup_DebrisTrigger,
+	CollisionGroup_InteractiveDebris,
+	CollisionGroup_Interactive,
+	CollisionGroup_Player,
+	CollisionGroup_BreakableGlass,
+	CollisionGroup_Vehicle,
+	CollisionGroup_PlayerMovement,
+
+	CollisionGroup_NPC = 9,
+	CollisionGroup_InVehicle,
+	CollisionGroup_Weapon,
+	CollisionGroup_VehicleClip,
+	CollisionGroup_Projectile,
+	CollisionGroup_DoorBlocker,
+	CollisionGroup_PassableDoor,
+	CollisionGroup_Dissolving,
+	CollisionGroup_Pushaway,
+
+	CollisionGroup_NPCActor = 18,
+	CollisionGroup_NPCScripted,
+	
+	LastSharedCollisionGroup = 20
+};
+
+enum __SolidType_t {
+	SolidType_None = 0,
+	SolidType_BSP,
+	SolidType_BBOX,
+	SolidType_OBB,
+	SolidType_OBB_YAW,
+	SolidType_Custom,
+	SolidType_VPhysics,
+	SolidType_Last
+};
+
+enum __SolidFlags_t {
+	SolidFlags_CustomRawTest = 0x0001,
+	SolidFlags_CustomBoxTest = 0x0002,
+	SolidFlags_NotSolid = 0x0004,
+	SolidFlags_Trigger = 0x0008,
+	SolidFlags_Standable = 0x0010,
+	SolidFlags_VolumeContents = 0x0020,
+	SolidFlags_ForceWorldAligned = 0x0040,
+	SolidFlags_UseTriggerBounds = 0x0080,
+	SolidFlags_RootParentAligned = 0x0100,
+	SolidFlags_TriggerTouchDebris = 0x0200,
+	SolidFlags_MaxBits = 10
+};
+
+/**
+ * for문으로 플레이어를 찾습니다.
+ *
+ * @param %1		Looping integer value
+ */
+#define		FIND_ALL_PLAYERS(%1)	for ( %1 = 1; %1 <= MaxClients; %1 ++ )
+
+/**
+ * for문으로 엔티티를 찾습니다.
+ *
+ * @param %1		Looping integer value
+ */
+#define		FIND_ALL_ENTITIES(%1)	for ( %1 = MaxClients; %1 <= GetMaxEntities (); %1 ++ )
+
+/**
+ * for문 안에서 플레이어를 찾을 때 사용합니다.
+ *
+ * @param %1		looping integer value
+ * @param %2		Player
+ */
+#define		VALID_PLAYER_IN_FOR(%1,%2)		( ( ( %2 = Player ( %1 ) ) != INVALID_PLAYER ) && %2.isValid () )
+
+/**
+ * for문 안에서 엔티티를 찾을 때 사용합니다.
+ *
+ * @param %1		looping integer value
+ * @param %2		Entity
+ */
+#define		VALID_ENTITY_IN_FOR(%1,%2)		( ( %2 = Entity ( %1 ) ) != INVALID_ENTITY )
+
+#include "include/qufnrTools/tracerayfilter"
+#include "include/qufnrTools/entity"
+#include "include/qufnrTools/weapon"
+#include "include/qufnrTools/player"
+#include "include/qufnrTools/particleeffect"
+#include "include/qufnrTools/timer"
+#include "include/qufnrTools/menu"
+#include "include/qufnrTools/csgo"
+#include "include/qufnrTools/float"
+#include "include/qufnrTools/string"
+#include "include/qufnrTools/vector"
+
 /**
  * 색깔을 포멧합니다.
  *
@@ -45,7 +149,7 @@ static char g_strEscapeSequence[4][2][32] = {
  */
 stock bool qufnrTools_FormatColor ( char[] format, int maxlen ) {
 	if ( GetEngineVersion () != Engine_CSGO ) {
-		LogError ( "'qufnrTools_FormatColor()' Function is not supported on this engine." );
+		LogError ( "'qufnrTools_FormatColor()' Function is not support on this engine." );
 		return false;
 	}	
 	
@@ -71,7 +175,7 @@ stock bool qufnrTools_FormatColor ( char[] format, int maxlen ) {
  */
 stock bool qufnrTools_FormatEscapeSequence ( char[] format, int maxlen ) {
 	if ( GetEngineVersion () != Engine_CSGO ) {
-		LogError ( "'qufnrTools_FormatEscapeSequence()' Function is not supported on this engine." );
+		LogError ( "'qufnrTools_FormatEscapeSequence()' Function is not support on this engine." );
 		return false;
 	}	
 	
@@ -99,7 +203,7 @@ stock bool qufnrTools_FormatEscapeSequence ( char[] format, int maxlen ) {
  */
 stock void qufnrTools_ReplyToCommand ( int client, const char[] format, any ... ) {
 	if ( GetEngineVersion () != Engine_CSGO ) {
-		LogError ( "'qufnrTools_ReplyToCommand()' Function is not supported on this engine." );
+		LogError ( "'qufnrTools_ReplyToCommand()' Function is not support on this engine." );
 		return;
 	}	
 	
@@ -130,7 +234,7 @@ stock void qufnrTools_ReplyToCommand ( int client, const char[] format, any ... 
  */
 stock void qufnrTools_PrintToChat ( int client, const char[] format, any ... ) {
 	if ( GetEngineVersion () != Engine_CSGO ) {
-		LogError ( "'qufnrTools_PrintToChat()' Function is not supported on this engine." );
+		LogError ( "'qufnrTools_PrintToChat()' Function is not support on this engine." );
 		return;
 	}	
 	
@@ -156,14 +260,15 @@ stock void qufnrTools_PrintToChat ( int client, const char[] format, any ... ) {
  */
 stock void qufnrTools_PrintToChatAll ( const char[] format, any ... ) {
 	if ( GetEngineVersion () != Engine_CSGO ) {
-		LogError ( "'qufnrTools_PrintToChatAll()' Function is not supported on this engine." );
+		LogError ( "'qufnrTools_PrintToChatAll()' Function is not support on this engine." );
 		return;
 	}
 
 	char buffer[254];
 	
-	for ( int i = 1; i <= MaxClients; i ++ ) {
-		if ( loringlib_IsValidClient ( i ) && !IsFakeClient ( i ) ) {
+	Player player; int i;
+	FIND_ALL_PLAYERS ( i ) {
+		if ( VALID_PLAYER_IN_FOR ( i, player ) && !player.isFake () ) {
 			SetGlobalTransTarget ( i );
 			VFormat ( buffer, sizeof ( buffer ), format, 2 );
 			qufnrTools_PrintToChat ( i, "%s", buffer );
@@ -179,7 +284,7 @@ stock void qufnrTools_PrintToChatAll ( const char[] format, any ... ) {
  */
 stock void qufnrTools_PrintHintText ( int client, const char[] format, any ... ) {
 	if ( GetEngineVersion () != Engine_CSGO ) {
-		LogError ( "'qufnrTools_PrintHintText()' Function is not supported on this engine." );
+		LogError ( "'qufnrTools_PrintHintText()' Function is not support on this engine." );
 		return;
 	}
 	
@@ -205,14 +310,15 @@ stock void qufnrTools_PrintHintText ( int client, const char[] format, any ... )
  */
 stock bool qufnrTools_PrintHintTextAll ( const char[] format, any ... ) {
 	if ( GetEngineVersion () != Engine_CSGO ) {
-		LogError ( "'qufnrTools_PrintHintTextAll()' Function is not supported on this engine." );
+		LogError ( "'qufnrTools_PrintHintTextAll()' Function is not support on this engine." );
 		return;
 	}
 
 	char buffer[254];
 	
-	for ( int i = 1; i <= MaxClients; i ++ ) {
-		if ( loringlib_IsValidClient ( i ) && !IsFakeClient ( i ) ) {
+	Player player; int i;
+	FIND_ALL_PLAYERS ( i ) {
+		if ( VALID_PLAYER_IN_FOR ( i, player ) && !player.isFake () ) {
 			SetGlobalTransTarget ( i );
 			VFormat ( buffer, sizeof ( buffer ), format, 2 );
 			qufnrTools_PrintHintText ( i, "%s", buffer );
@@ -228,7 +334,7 @@ stock bool qufnrTools_PrintHintTextAll ( const char[] format, any ... ) {
  */
 stock void qufnrTools_PrintCenterText ( int client, const char[] format, any ... ) {
 	if ( GetEngineVersion () != Engine_CSGO ) {
-		LogError ( "'qufnrTools_PrintCenterText()' Function is not supported on this engine." );
+		LogError ( "'qufnrTools_PrintCenterText()' Function is not support on this engine." );
 		return;
 	}
 	
@@ -254,17 +360,114 @@ stock void qufnrTools_PrintCenterText ( int client, const char[] format, any ...
  */
 stock bool qufnrTools_PrintCenterTextAll ( const char[] format, any ... ) {
 	if ( GetEngineVersion () != Engine_CSGO ) {
-		LogError ( "'qufnrTools_PrintCenterTextAll()' Function is not supported on this engine." );
+		LogError ( "'qufnrTools_PrintCenterTextAll()' Function is not support on this engine." );
 		return;
 	}
 
 	char buffer[254];
 	
-	for ( int i = 1; i <= MaxClients; i ++ ) {
-		if ( loringlib_IsValidClient ( i ) && !IsFakeClient ( i ) ) {
+	Player player; int i;
+	FIND_ALL_PLAYERS ( i ) {
+		if ( VALID_PLAYER_IN_FOR ( i, player ) && !player.isFake () ) {
 			SetGlobalTransTarget ( i );
 			VFormat ( buffer, sizeof ( buffer ), format, 2 );
 			qufnrTools_PrintCenterText ( i, "%s", buffer );
+		}
+	}
+}
+
+/**
+ * 클라이언트에게 game_text를 보냅니다.
+ * @param format		내용
+ * @param ...			포멧 파라메터 값
+ * @noreturn
+ */
+stock void qufnrTools_ShowHudText ( int client, int channel, const char[] format, any ... ) {
+
+	char buffer[254];
+	
+	SetGlobalTransTarget ( client );
+	VFormat ( buffer, sizeof ( buffer ), format, 4 );
+	
+	for ( int x = 0; x < sizeof ( g_strEscapeSequence ); x ++ )
+		ReplaceString ( buffer, PLATFORM_MAX_PATH, g_strEscapeSequence[x][0], g_strEscapeSequence[x][1] );
+	
+	ShowHudText ( client, channel, "%s", buffer );
+}
+
+stock void qufnrTools_ShowHudTextAll ( int channel, const char[] format, any ... ) {
+	char buffer[254];
+	Player player; int i;
+	FIND_ALL_PLAYERS ( i ) {
+		if ( VALID_PLAYER_IN_FOR ( i, player ) && !player.isFake () ) {
+			SetGlobalTransTarget ( i );
+			VFormat ( buffer, sizeof ( buffer ), format, 3 );
+			
+			for ( int x = 0; x < sizeof ( g_strEscapeSequence ); x ++ )
+				ReplaceString ( buffer, PLATFORM_MAX_PATH, g_strEscapeSequence[x][0], g_strEscapeSequence[x][1] );
+			
+			ShowHudText ( i, channel, "%s", buffer );
+		}
+	}
+}
+
+/**
+ * 클라이언트에게 Sync game_text를 보냅니다.
+ * @param format		내용
+ * @param ...			포멧 파라메터 값
+ * @noreturn
+ */
+stock void qufnrTools_ShowSyncHudText ( int client, Handle sync, const char[] format, any ... ) {
+
+	char buffer[254];
+	
+	SetGlobalTransTarget ( client );
+	VFormat ( buffer, sizeof ( buffer ), format, 4 );
+	
+	for ( int x = 0; x < sizeof ( g_strEscapeSequence ); x ++ )
+		ReplaceString ( buffer, PLATFORM_MAX_PATH, g_strEscapeSequence[x][0], g_strEscapeSequence[x][1] );
+	
+	ShowSyncHudText ( client, sync, "%s", buffer );
+}
+
+stock void qufnrTools_ShowSyncHudTextAll ( Handle sync, const char[] format, any ... ) {
+	char buffer[254];
+	Player player; int i;
+	FIND_ALL_PLAYERS ( i ) {
+		if ( VALID_PLAYER_IN_FOR ( i, player ) && !player.isFake () ) {
+			SetGlobalTransTarget ( i );
+			VFormat ( buffer, sizeof ( buffer ), format, 3 );
+			
+			for ( int x = 0; x < sizeof ( g_strEscapeSequence ); x ++ )
+				ReplaceString ( buffer, PLATFORM_MAX_PATH, g_strEscapeSequence[x][0], g_strEscapeSequence[x][1] );
+			
+			ShowSyncHudText ( i, sync, "%s", buffer );
+		}
+	}
+}
+
+/**
+ * Shows screen center text on CS:GO
+ *
+ * @param client
+ * @param duration
+ * @param message
+ */
+stock void qufnrTools_PrintPanelText ( int client = -1, int duration, const char[] message, any ... ) {
+	Event message = CreateEvent ( "show_survival_respawn_status" );
+	if ( message != null ) {
+		static char szBuffer[512];
+		if ( client != -1 )
+			SetGlobalTransTarget ( client );
+		VFormat ( szBuffer, sizeof szBuffer, message, 4 );
+		message.SetString ( "loc_token", szBuffer );
+		message.SetInt ( "duration", duration );
+		message.SetInt ( "userid", -1 );
+		if ( client == -1 )
+			message.Fire ();
+		else {
+			message.FireToClient ( client );
+			message.Cancel ();
 		}
 	}
 }
@@ -279,8 +482,9 @@ stock bool qufnrTools_PrintToChatAdmin ( const char[] format, any ... ) {
 	char buffer[254];
 	bool result = false;
 	
-	for ( int i = 1; i <= MaxClients; i ++ ) {
-		if ( loringlib_IsValidClient ( i ) && loringlib_IsClientAdmin ( i ) && !IsFakeClient ( i ) ) {
+	Player player; int i;
+	FIND_ALL_PLAYERS ( i ) {
+		if ( VALID_PLAYER_IN_FOR ( i, player ) && !player.isFake () && player.isAdmin () ) {
 			SetGlobalTransTarget ( i );
 			VFormat ( buffer, sizeof buffer, format, 2 );
 			qufnrTools_PrintToChat ( i, "%s", buffer );
@@ -302,9 +506,10 @@ stock bool qufnrTools_PrintToChatAdmin ( const char[] format, any ... ) {
 stock bool qufnrTools_PrintToConsoleAdmin ( const char[] format, any ... ) {
 	char buffer[254];
 	bool result = false;
-	
-	for ( int i = 1; i <= MaxClients; i ++ ) {
-		if ( loringlib_IsValidClient ( i ) && loringlib_IsClientAdmin ( i ) && !IsFakeClient ( i ) ) {
+
+	Player player; int i;
+	FIND_ALL_PLAYERS ( i ) {
+		if ( VALID_PLAYER_IN_FOR ( i, player ) && !player.isFake () && player.isAdmin () ) {
 			SetGlobalTransTarget ( i );
 			VFormat ( buffer, sizeof buffer, format, 2 );
 			PrintToConsole ( i, "%s", buffer );
@@ -317,150 +522,169 @@ stock bool qufnrTools_PrintToConsoleAdmin ( const char[] format, any ... ) {
 	return result;
 }
 
-/**
- * @section	진행 상태 표시 함수에 사용되는 값들
- */
-#define		PROGRESS_BAR_BLOCK		"██"	/**< 채워진 칸 */
-#define		PROGRESS_BAR_BLANK		" "	/**< 빈 칸 */
-#define		PROGRESS_BAR_LENGTH		10		/**< 칸 갯수 */
-#define		PROGRESS_BAR_TICKS		0.1		/**< Progress Bar가 몇 틱마다 실행할지? */
-static float g_fClientProgressValue[MAXPLAYERS + 1] = { 0.0, ... };
-static float g_fClientProgressTotalValue[MAXPLAYERS + 1] = { 0.0, ... };
-static Handle g_hClientProgressBarHandler[MAXPLAYERS + 1] = { null, ... };
-static char g_strProgressBarColors[][] = {	/**< Progress Bar 색상 */
-	"#CC3D3D"		//	0
-	, "#F06161"
-	, "#E0844F"
-	, "#F29661"
-	, "#CCA63D"
-	, "#DEB84F"
-	, "#C4B73B"
-	, "#D6C94D"
-	, "#8DB72A"
-	, "#7BA518"
-	, "#699306"
-};
+// /**
+//  * @section	진행 상태 표시 함수에 사용되는 값들
+//  */
+// #define		PROGRESS_BAR_BLOCK		"██"	/**< 채워진 칸 */
+// #define		PROGRESS_BAR_BLANK		" "	/**< 빈 칸 */
+// #define		PROGRESS_BAR_LENGTH		10		/**< 칸 갯수 */
+// #define		PROGRESS_BAR_TICKS		0.1		/**< Progress Bar가 몇 틱마다 실행할지? */
+// static float s_fClientProgressValue[MAXPLAYERS + 1] = { 0.0, ... };
+// static float s_fClientProgressTotalValue[MAXPLAYERS + 1] = { 0.0, ... };
+// static Handle s_hClientProgressBarHandler[MAXPLAYERS + 1] = { null, ... };
+// static char s_strProgressBarColors[][] = {	/**< Progress Bar 색상 */
+// 	"#CC3D3D"		//	0
+// 	, "#F06161"
+// 	, "#E0844F"
+// 	, "#F29661"
+// 	, "#CCA63D"
+// 	, "#DEB84F"
+// 	, "#C4B73B"
+// 	, "#D6C94D"
+// 	, "#8DB72A"
+// 	, "#7BA518"
+// 	, "#699306"
+// };
 
-/**
- * 진행 상태(Progress Bar)를 표시합니다.
- * @note	CS:GO에서만 작동합니다. 다른 엔진에서는 표시가 안되거나, 이상이 있을 수 있습니다.
- *
- * @param client		표시할 상대 클라이언트 값
- * @param total_values	전체 값
- * @noreturn
- */
-stock void qufnrTools_DisplayProgressBar ( int client, float total_values ) {
-	if ( GetEngineVersion () != Engine_CSGO )
-		LogMessage ( "'qufnrTools_DisplayProgressBar()' Function is may have some problems on this engine." );
+// /**
+//  * 진행 상태(Progress Bar)를 표시합니다.
+//  * @note	CS:GO에서만 작동합니다. 다른 엔진에서는 표시가 안되거나, 이상이 있을 수 있습니다.
+//  *
+//  * @param client		표시할 상대 클라이언트 값
+//  * @param total_values	전체 값
+//  * @noreturn
+//  */
+// stock void qufnrTools_DisplayProgressBar ( int client, float total_values ) {
+// 	if ( GetEngineVersion () != Engine_CSGO )
+// 		LogMessage ( "'qufnrTools_DisplayProgressBar()' Function is may have some problems on this engine." );
 	
-	if ( total_values <= 0.0 )
-		return;
+// 	if ( total_values <= 0.0 )
+// 		return;
 	
-	if ( !loringlib_IsValidClient ( client ) )
-		return;
+// 	if ( !loringlib_IsValidClient ( client ) )
+// 		return;
 		
-	if ( IsFakeClient ( client ) )
-		return;
+// 	if ( IsFakeClient ( client ) )
+// 		return;
 	
-	if ( g_hClientProgressBarHandler[client] == null ) {
-		g_fClientProgressValue[client] = 0.0;
-		g_fClientProgressTotalValue[client] = total_values;
-		g_hClientProgressBarHandler[client] = CreateTimer ( PROGRESS_BAR_TICKS, qufnrTools_DisplayProgressBarTimer, client, TIMER_REPEAT );
-	}
+// 	if ( s_hClientProgressBarHandler[client] == null ) {
+// 		s_fClientProgressValue[client] = 0.0;
+// 		s_fClientProgressTotalValue[client] = total_values;
+// 		s_hClientProgressBarHandler[client] = CreateTimer ( PROGRESS_BAR_TICKS, qufnrTools_DisplayProgressBarTimer, client, TIMER_REPEAT );
+// 	}
 	
-	else {
-		KillTimer ( g_hClientProgressBarHandler[client] );
-		g_hClientProgressBarHandler[client] = null;
+// 	else {
+// 		KillTimer ( s_hClientProgressBarHandler[client] );
+// 		s_hClientProgressBarHandler[client] = null;
 		
-		g_fClientProgressValue[client] = 0.0;
-		g_fClientProgressTotalValue[client] = total_values;
-		g_hClientProgressBarHandler[client] = CreateTimer ( PROGRESS_BAR_TICKS, qufnrTools_DisplayProgressBarTimer, client, TIMER_REPEAT );
-	}
-}
+// 		s_fClientProgressValue[client] = 0.0;
+// 		s_fClientProgressTotalValue[client] = total_values;
+// 		s_hClientProgressBarHandler[client] = CreateTimer ( PROGRESS_BAR_TICKS, qufnrTools_DisplayProgressBarTimer, client, TIMER_REPEAT );
+// 	}
+// }
 
-public Action qufnrTools_DisplayProgressBarTimer ( Handle timer, any client ) {
-	if ( !loringlib_IsValidClient ( client ) ) {
-		g_hClientProgressBarHandler[client] = null;
-		return Plugin_Stop;
-	}
+// public Action qufnrTools_DisplayProgressBarTimer ( Handle timer, any client ) {
+// 	if ( !loringlib_IsValidClient ( client ) ) {
+// 		s_hClientProgressBarHandler[client] = null;
+// 		return Plugin_Stop;
+// 	}
 		
-	if ( IsFakeClient ( client ) ) {
-		g_hClientProgressBarHandler[client] = null;
-		return Plugin_Stop;
-	}
+// 	if ( IsFakeClient ( client ) ) {
+// 		s_hClientProgressBarHandler[client] = null;
+// 		return Plugin_Stop;
+// 	}
 	
-	static char progress[64];
-	if ( !qufnrTools_DisplayProgressBarCalcul ( g_fClientProgressValue[client], g_fClientProgressTotalValue[client], progress, sizeof ( progress ) ) ) {
-		int blocks = qufnrTools_GetProgressBarBlocks ( g_fClientProgressValue[client], g_fClientProgressTotalValue[client] );
-		g_fClientProgressValue[client] += 0.1;
-		PrintCenterText ( client, "[TIME: %.1f / %.1f] <font color='%s'>%s</font>", g_fClientProgressValue[client], g_fClientProgressTotalValue[client], g_strProgressBarColors[blocks], progress );
-	}
+// 	static char progress[64];
+// 	if ( !qufnrTools_DisplayProgressBarCalcul ( s_fClientProgressValue[client], s_fClientProgressTotalValue[client], progress, sizeof ( progress ) ) ) {
+// 		int blocks = qufnrTools_GetProgressBarBlocks ( s_fClientProgressValue[client], s_fClientProgressTotalValue[client] );
+// 		s_fClientProgressValue[client] += 0.1;
+// 		PrintCenterText ( client, "[TIME: %.1f / %.1f] <font color='%s'>%s</font>", s_fClientProgressValue[client], s_fClientProgressTotalValue[client], s_strProgressBarColors[blocks], progress );
+// 	}
 	
-	else {
-		PrintCenterText ( client, "<font color='#ff0000'>！！！</font><font class='fontSize-l'> TIME OVER </font><font color='#ff0000'>！！！</font>" );
-		g_fClientProgressValue[client] = 0.0;
-		g_fClientProgressTotalValue[client] = 0.0;
-		g_hClientProgressBarHandler[client] = null;
-		return Plugin_Stop;
-	}
+// 	else {
+// 		PrintCenterText ( client, "<font color='#ff0000'>！！！</font><font class='fontSize-l'> TIME OVER </font><font color='#ff0000'>！！！</font>" );
+// 		s_fClientProgressValue[client] = 0.0;
+// 		s_fClientProgressTotalValue[client] = 0.0;
+// 		s_hClientProgressBarHandler[client] = null;
+// 		return Plugin_Stop;
+// 	}
 	
-	return Plugin_Continue;
-}
+// 	return Plugin_Continue;
+// }
 
-/**
- * 진행 상태(Progress Bar) 표시를 계산합니다.
- *
- * @param values		현재 값
- * @param total_values	전체 값
- * @param buffer		상태 표시 문자열 포멧
- * @param maxlen		포멧 길이
- * @return	최대 값(100%)에 도달 했다면 true, 아니면 false를 반환합니다.
- */
-stock bool qufnrTools_DisplayProgressBarCalcul ( float values, float total_values, char[] buffer, int maxlen ) {
-	char format[64];
-	Format ( format, sizeof ( format ), "" );
+// /**
+//  * 진행 상태(Progress Bar) 표시를 계산합니다.
+//  *
+//  * @param values		현재 값
+//  * @param total_values	전체 값
+//  * @param buffer		상태 표시 문자열 포멧
+//  * @param maxlen		포멧 길이
+//  * @return	최대 값(100%)에 도달 했다면 true, 아니면 false를 반환합니다.
+//  */
+// stock bool qufnrTools_DisplayProgressBarCalcul ( float values, float total_values, char[] buffer, int maxlen, char blank[8] = PROGRESS_BAR_BLANK, char block[8] = PROGRESS_BAR_BLOCK ) {
 	
-	float ticks = float ( 100 / PROGRESS_BAR_LENGTH );	//	퍼센트 마다 블록 추가
+// 	char format[64];
+// 	Format ( format, sizeof ( format ), "" );
 	
-	int blocks;		//	블록 갯수
-	float percent;	//	퍼센트
+// 	float ticks = float ( 100 / PROGRESS_BAR_LENGTH );	//	퍼센트 마다 블록 추가
 	
-	percent = values / total_values * 100.0;	//	퍼센트 계산
-	blocks = RoundFloat ( percent / ticks );	//	갯수 계산
+// 	int blocks;		//	블록 갯수
+// 	float percent;	//	퍼센트
 	
-//	PrintToServer ( "Blocks: %d, Percent: %.2f", blocks, percent );
+// 	percent = values / total_values * 100.0;	//	퍼센트 계산
+// 	blocks = RoundFloat ( percent / ticks );	//	갯수 계산
 	
-	for ( int i = 0; i < PROGRESS_BAR_LENGTH; i ++ ) {
-		if ( blocks > i )
-			Format ( format, sizeof ( format ), "%s%s", format, PROGRESS_BAR_BLOCK );
-		else
-			Format ( format, sizeof ( format ), "%s%s", format, PROGRESS_BAR_BLANK );
-	}
+// //	PrintToServer ( "Blocks: %d, Percent: %.2f", blocks, percent );
 	
-	Format ( buffer, maxlen, "%s", format );
+// 	for ( int i = 0; i < PROGRESS_BAR_LENGTH; i ++ ) {
+// 		if ( blocks > i )
+// 			Format ( format, sizeof ( format ), "%s%s", format, block );
+// 		else
+// 			Format ( format, sizeof ( format ), "%s%s", format, blank );
+// 	}
 	
-	if ( values <= total_values )
-		return false;
+// 	Format ( buffer, maxlen, "%s", format );
 	
-	return true;
-}
+// 	if ( values <= total_values )
+// 		return false;
+	
+// 	return true;
+// }
 
-/**
- * 진행 상태(Progress Bar)에서 블록 갯수를 구합니다.
- *
- * @param values		현재 값
- * @param total_values	전체 값
- * @return	블록 갯수
- */
-stock int qufnrTools_GetProgressBarBlocks ( float values, float total_values ) {
-	float ticks = float ( 100 / PROGRESS_BAR_LENGTH );
-	int blocks;
-	float percent;
-	percent = values / total_values * 100.0;
-	blocks = RoundFloat ( percent / ticks );
+// /**
+//  * 진행 상태(Progress Bar)에서 블록 갯수를 구합니다.
+//  *
+//  * @param values		현재 값
+//  * @param total_values	전체 값
+//  * @return	블록 갯수
+//  */
+// stock int qufnrTools_GetProgressBarBlocks ( float values, float total_values ) {
+// 	float ticks = float ( 100 / PROGRESS_BAR_LENGTH );
+// 	int blocks;
+// 	float percent;
+// 	percent = values / total_values * 100.0;
+// 	blocks = RoundFloat ( percent / ticks );
 	
-	return blocks;
-}
+// 	return blocks;
+// }
+
+
+// /**
+//  * 진행 상태(Progress Bar)의 색깔을 구합니다.
+//  *
+//  * @param values		현재 값
+//  * @param total_values	전체 값
+//  * @param format
+//  * @param format_size
+//  */
+// stock void qufnrTools_GetProgressBarColor ( float values, float total_values, char[] format, int format_size ) {
+// 	int colornum = qufnrTools_GetProgressBarBlocks ( values, total_values );
+// 	if ( colornum < 0 )
+// 		colornum = 0;
+// 	if ( colornum > PROGRESS_BAR_LENGTH )
+// 		colornum = PROGRESS_BAR_LENGTH;
+// 	Format ( format, format_size, "%s", s_strProgressBarColors[colornum] );
+// }
 
 #define MAX_HUD_COLORS		12
 static int g_iCSGOHudColors[MAX_HUD_COLORS][4] = {
@@ -477,26 +701,7 @@ static int g_iCSGOHudColors[MAX_HUD_COLORS][4] = {
 	, { 255, 121, 153, 255 }
 	, { 213, 226, 134, 255 }
 };
-
 static int g_iClientCSGOHudClr[MAXPLAYERS + 1];
-
-/**
- * 진행 상태(Progress Bar)의 색깔을 구합니다.
- *
- * @param values		현재 값
- * @param total_values	전체 값
- * @param format
- * @param format_size
- */
-stock void qufnrTools_GetProgressBarColor ( float values, float total_values, char[] format, int format_size ) {
-	int colornum = qufnrTools_GetProgressBarBlocks ( values, total_values );
-	if ( colornum < 0 )
-		colornum = 0;
-	if ( colornum > PROGRESS_BAR_LENGTH )
-		colornum = PROGRESS_BAR_LENGTH;
-	Format ( format, format_size, "%s", g_strProgressBarColors[colornum] );
-}
-
 public void qufnrTools_GetClientHudColor ( QueryCookie cookie, int client, ConVarQueryResult result, const char[] name, const char[] value ) {
 	if ( StringToInt ( value ) < 0 || StringToInt ( value ) > 11 )
 		g_iClientCSGOHudClr[client] = 0;
@@ -575,81 +780,4 @@ stock bool qufnrTools_DisplayProgressBarTime ( int client, int time = 10 ) {
  */
 stock bool qufnrTools_KillProgressBarTime ( int client ) {
 	return qufnrTools_DisplayProgressBarTime ( client, 0 );
-}
-
-static char WEAPON_NAME_ARRAY[54][2][64] = {
-	{ "weapon_glock", "Glock-18" }
-	, { "weapon_hkp2000", "P2000" }
-	, { "weapon_usp_silencer", "USP-S" }
-	, { "weapon_usp", "USP-S" }
-	, { "weapon_p250", "P250" }
-	, { "weapon_p228", "P228" }
-	, { "weapon_fiveseven", "Five-SeveN" }
-	, { "weapon_deagle", "Desert Eagle" }
-	, { "weapon_cz75a", "CZ75-Auto" }
-	, { "weapon_revolver", "R8 Revolver" }
-	, { "weapon_tec9", "Tec-9" }
-	, { "weapon_elite", "Dual Berettas" }
-	, { "weapon_mp9", "MP9" }
-	, { "weapon_tmp", "TMP" }
-	, { "weapon_mp7", "MP7" }
-	, { "weapon_ump45", "UMP-45" }
-	, { "weapon_p90", "P90" }
-	, { "weapon_bizon", "PP-Bizon" }
-	, { "weapon_mp5sd", "MP5SD" }
-	, { "weapon_mp5navy", "MP5" }
-	, { "weapon_famas", "FAMAS" }
-	, { "weapon_galil", "Galil" }
-	, { "weapon_galilar", "Galil AR" }
-	, { "weapon_m4a1", "M4A4" }
-	, { "weapon_m4a1_silencer", "M4A1-S" }
-	, { "weapon_ak47", "AK-47" }
-	, { "weapon_scar20", "SCAR-20" }
-	, { "weapon_sg550", "SG 550" }
-	, { "weapon_g3sg1", "G3SG1" }
-	, { "weapon_ssg08", "SSG-08" }
-	, { "weapon_awp", "AWP" }
-	, { "weapon_sg553", "SG 553" }
-	, { "weapon_sg552", "SG 552" }
-	, { "weapon_aug", "AUG" }
-	, { "weapon_nova", "Nova" }
-	, { "weapon_m3", "M3" }
-	, { "weapon_xm1014", "XM1014" }
-	, { "weapon_mag7", "MAG-7" }
-	, { "weapon_sawedoff", "Sawed-Off" }
-	, { "weapon_m249", "M249" }
-	, { "weapon_negev", "Negev" }
-	, { "weapon_flashbang", "Flashbang Grenade" }
-	, { "weapon_smokegrenade", "Smoke Grenade" }
-	, { "weapon_decoy", "Decoy Grenade" }
-	, { "weapon_molotov", "Molotov" }
-	, { "weapon_incgrenade", "Incendiary Grenade" }
-	, { "weapon_tagrenade", "Tactical Awareness Grenade" }
-	, { "weapon_healthshot", "Medi-Shot" }
-	, { "weapon_snowball", "SnowBall" }
-	, { "weapon_hammer", "Hammer" }
-	, { "weapon_axe", "Axe" }
-	, { "weapon_spanner", "Spanner" }
-	, { "weapon_knife", "Knife" }
-	, { "weapon_knifegg", "Golden Knife" }
-};
-
-/**
- * 무기 클래스 이름을 무기 이름으로 바꿉니다.
- *
- * @param classname		무기 클래스 명
- * @param buffer
- * @param maxlen
- * @noreturn
- */
-stock void qufnrTools_WeaponClassnameToAlias ( char[] classname, char[] buffer, int maxlen ) {
-	for ( int i = 0; i < sizeof WEAPON_NAME_ARRAY; i ++ ) {
-		if ( StrEqual ( classname, WEAPON_NAME_ARRAY[i][0] ) ) {
-			strcopy ( buffer, maxlen, WEAPON_NAME_ARRAY[i][1] );
-			if ( GetEngineVersion () == Engine_CSS ) {
-				if ( StrContains ( classname, "m4a1" ) != -1 )
-					strcopy ( buffer, maxlen, "M4A1" );
-			}
-		}
-	}
 }
