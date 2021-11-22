@@ -91,7 +91,7 @@ methodmap Entity {
      * @return              True on success, false otherwise.
      * @error               Invalid entity index, or no mod support.
      */
-    public bool disaptchValueFloat ( const char[] keyName, float value ) {
+    public bool dispatchValueFloat ( const char[] keyName, float value ) {
         return DispatchKeyValueFloat ( this.index, keyName, value );
     }
 
@@ -854,7 +854,7 @@ stock Entity createEntity ( const char[] classname ) {
  */
 stock int qufnrTools_GetEntities () {
     int nResult = 0, i;
-    Entity entity;
+    Entity entity = INVALID_ENTITY;
     FIND_ALL_ENTITIES(i) {
         if ( ( entity = Entity ( i ) ) != INVALID_ENTITY )
             nResult ++;
@@ -903,7 +903,7 @@ stock void qufnrTools_KillEntity ( int entity, float value = 0.0 ) {
  */
 stock int qufnrTools_RemoveEntityByName ( const char[] classname ) {
     int nCnt = 0, i;
-    Entity entities;
+    Entity entities = INVALID_ENTITY;
     char szClassname[32];
     FIND_ALL_ENTITIES(i) {
         if ( ( entities = Entity ( i ) ) != INVALID_ENTITY ) {
@@ -978,7 +978,10 @@ stock Entity qufnrTools_CreateLightDynamic ( int owner = -1, float origin[3] = {
         }
         entity.teleport ( origin, NULL_VECTOR, NULL_VECTOR );
 
-        if ( attachment && player != null ) {
+        
+        if ( attachment && owner != -1 ) {
+            Player player = Player ( owner );
+
             SetVariantString ( "!activator" );
             entity.acceptInput ( "SetParent", player.index, entity.index, 0 );
             entity.setPropEnt ( Prop_Data, "m_pParent", player.index );
@@ -1108,7 +1111,7 @@ stock void qufnrTools_SetEntitySolidFlags ( int entity, __SolidFlags_t solidFlag
  * @param owner     Owner로 설정할 엔티티 또는 클라이언트 인덱스
  */
 stock void qufnrTools_SetOwner ( int entity, int owner ) {
-    SetEntPropEnt ( entity, "m_hOwner", owner );
+    SetEntPropEnt ( entity, Prop_Send, "m_hOwner", owner );
 }
 
 /**

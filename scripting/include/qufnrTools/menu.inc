@@ -119,4 +119,5 @@ stock void qufnrTools_DrawPanelText ( Panel panel, int target = -1, const char[]
 public int qufnrTools_MenuNoSelect ( Menu menu, MenuAction action, int param1, int param2 ) {
 	if ( action == MenuAction_End )
 		delete menu;
+	return param2;
 }

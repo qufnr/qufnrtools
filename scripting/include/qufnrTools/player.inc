@@ -1440,7 +1440,7 @@ methodmap Player < Entity {
 	 * Get client's aim target entity.
 	 */
 	public Entity getAimEntity () {
-		Entity result;
+		Entity result = INVALID_ENTITY;
 		float flAngles[3], flOrigin[3];
 		this.getEyeAngles ( flAngles );
 		this.getEyePosition ( flOrigin );
@@ -1736,7 +1736,7 @@ stock bool qufnrTools_IsValidClient ( int client ) {
  */
 stock int qufnrTools_GetPlayers () {
 	int nResult = 0;
-	Player player;
+	Player player = INVALID_PLAYER;
 	int i = 1;
 	FIND_ALL_PLAYERS ( i ) {
 		if ( ( player = Player ( i ) ) != INVALID_PLAYER )

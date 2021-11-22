@@ -124,10 +124,10 @@ stock Entity qufnrTools_CreatePlayerPingCrosshair ( Player player, CSPingType ty
 	player.getEyePosition ( vecOrigin );
 	player.getEyeAngles ( vecAngles );
 
-	TR_TracecRayFilter ( vecOrigin, vecAngles, MASK_SHOT, RayType_Infinite, qufnrTools_TraceRayFilterIgnorePlayer );
+	TR_TraceRayFilter ( vecOrigin, vecAngles, MASK_SHOT, RayType_Infinite, qufnrTools_TraceRayFilterIgnorePlayer );
 
 	if ( !TR_DidHit ( null ) )
-		return -1;
+		return INVALID_ENTITY;
 	
 	TR_GetEndPosition ( vecOrigin, null );
 	
@@ -165,25 +165,25 @@ stock void qufnrTools_SetRoundTime ( int roundTime ) {
 
 enum CSMapType {
 	CSMapType_BombDefause = 0,	/**< de_ */
-	CSMapType_HostageRescue,		/**< cs_ */
-	CSMapType_DeathMatch,	/**< dm_ */
-	CSMapType_BattleArea,	/**< ar_ */
-	CSMapType_Combat,		/**< 1v1_, aim_ */
-	CSMapType_GunGame,		/**< gg_ */
-	CSMapType_KnifeArea,	/**< ka_ */
-	CSMapType_SniperWar,	/**< awp_ */
-	CSMapType_TroubleInTerroristTown,	/**< ttt_ */
-	CSMapType_ZombieMode,	/**< zm_ or zp_ */
-	CSMapType_ZombieEscape,	/**< ze_ */
-	CSMapType_Surf,			/**< surf_ */
-	CSMapType_Bhop,			/**< bhop_ */
-	CSMapType_Kz,			/**< kz_ */
-	CSMapType_Trikz,		/**< trikz_ */
-	CSMapType_Minigame,		/**< mg_ */
-	CSMapType_DeathRun,		/**< dr_ or deathrun_ */
-	CSMapType_JailBreak,	/**< jb_ */
-	CSMapType_Assassination,	/**< as_ */
-	CSMapType_DangerZone,	/**< dz_ */
+	CSMapType_HostageRescue = 1,		/**< cs_ */
+	CSMapType_DeathMatch = 2,	/**< dm_ */
+	CSMapType_BattleArea = 3,	/**< ar_ */
+	CSMapType_Combat = 4,		/**< 1v1_, aim_ */
+	CSMapType_GunGame = 5,		/**< gg_ */
+	CSMapType_KnifeArea = 6,	/**< ka_ */
+	CSMapType_SniperWar = 7,	/**< awp_ */
+	CSMapType_TroubleInTerroristTown = 8,	/**< ttt_ */
+	CSMapType_ZombieMode = 9,	/**< zm_ or zp_ */
+	CSMapType_ZombieEscape = 10,	/**< ze_ */
+	CSMapType_Surf = 11,			/**< surf_ */
+	CSMapType_Bhop = 12,			/**< bhop_ */
+	CSMapType_Kz = 13,			/**< kz_ */
+	CSMapType_Trikz = 14,		/**< trikz_ */
+	CSMapType_Minigame = 15,		/**< mg_ */
+	CSMapType_DeathRun = 16,		/**< dr_ or deathrun_ */
+	CSMapType_JailBreak = 17,	/**< jb_ */
+	CSMapType_Assassination = 18,	/**< as_ */
+	CSMapType_DangerZone = 19,	/**< dz_ */
 	CSMapType_Unknown = 100
 };
 
@@ -261,8 +261,7 @@ stock CSMapType qufnrTools_GetCSMapType () {
 	else if ( ( szMap[0] == 't' || szMap[0] == 'T' ) && strncmp ( "trikz_", szMap, 6 ) == -1 )
 		return CSMapType_Trikz;
 
-	else
-		return CSMapType_Unknown;
+	return CSMapType_Unknown;
 }
 
 /**
@@ -282,54 +281,4 @@ stock void qufnrTools_SetWinner ( int team ) {
  */
 stock void qufnrTools_SetRoundDraw () {
 	CS_TerminateRound ( FindConVar ( "mp_round_restart_delay" ).FloatValue, CSRoundEnd_Draw, true );
-}
-
-/**
- * Display win panel message to client.
- *
- * @param client
- * @param displayCount
- * @param text
- * @return 메세지를 표시했으면 true를 반환합니다.
- */
-static int g_nWinPanelDisplay[MAXPLAYERS + 1];
-static Handle g_hWinPanelHndl[MAXPLAYERS + 1];
-stock bool qufnrTools_PrintToWinPanelMessage ( int client, int displayCount = 1, const char[] text, any ... ) {
-	if ( client && !IsFakeClient ( client ) && g_hWinPanelHndl[client] == null ) {
-		if ( displayCount < 1 )
-			displayCount = 1;
-		
-		g_nWinPanelDisplay[client] = displayCount;
-
-		DataPack data = new DataPack ();
-		qufnrTools_TimerDisplayWinPanelMessage ( null, data );
-		g_hWinPanelHndl[client] = CreateDataTimer ( 1.0, qufnrTools_TimerDisplayWinPanelMessage, data, TIMER_REPEAT | TIMER_FLAG_NO_MAPCHANGE );
-		data.WriteCell ( GetClientSerial ( client ) );
-		data.WriteCell ( displayCount );
-		char strBuffer[1024];
-		SetGlobalTransTarget ( client );
-		VFormat ( strBuffer, sizeof strBuffer, text, 4 );
-		data.WriteString ( strBuffer );
-	}
-}
-
-public Action qufnrTools_TimerDisplayWinPanelMessage ( Handle timer, DataPack data ) {
-	data.Reset ();
-	int nClient = GetClientFromSerial ( data.ReadCell () );
-	int nDisplayCount = data.ReadCell ();
-
-	if ( !nClient || nDisplayCount <= 0 ) {
-		g_hWinPanelHndl[nClient] = null;
-		return Plugin_Stop;
-	}
-	
-	nDisplayCount --;
-	
-	Event hEvent = CreateEvent ( "cs_win_panel_round" );
-	char strText[1024];
-	hEvent.SetString ( "funcfact_token", strText );
-	hEvent.FireToClient ( nClient );
-	hEvent.Cancel ();
-
-	return Plugin_Continue;
 }

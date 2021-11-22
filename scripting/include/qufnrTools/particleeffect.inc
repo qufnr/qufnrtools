@@ -55,19 +55,19 @@ stock int qufnrTools_PrecacheParticle ( const char[] name ) {
  * @note            CreateEntityByName 함수를 사용해서 info_particle_system을 생성하여 파티클의 옵션을 설정하고 소환하는 방식입니다. 이 방식은 CS:GO에서만 테스트되었습니다. 파티클을 소환하기 전에, 파티클이 프리캐싱이 되었는지 확인하세요.
  */
 stock Entity qufnrTools_CreateParticle ( float pos[3], float ang[3], const char[] name, float lifeTime = 0.0, int owner = -1, bool sendToOwner = false, bool attachment = false, const char[] attachName = "" ) {
-    Entity entity = qufnrTools_CreateEntityByName ( "info_particle_system" );
+    Entity entity = createEntity ( "info_particle_system" );
     if ( entity.index != -1 ) {
         if ( attachment ) {
             if ( owner < 1 ) {
                 entity.removeEdict ();
-                return null;
+                return INVALID_ENTITY;
             }
             GetEntPropVector ( owner, Prop_Send, "m_vecOrigin", pos );
         }
         entity.teleport ( pos, ang, NULL_VECTOR );
 
-        entity.setKeyValue ( "effect_name", name );
-        entity.setKeyValue ( "start_active", "1" );
+        entity.dispatchValue ( "effect_name", name );
+        entity.dispatchValue ( "start_active", "1" );
 
         if ( attachment && owner != -1 ) {
             SetVariantString ( "!activator" );
@@ -116,7 +116,7 @@ stock Entity qufnrTools_DisplayParticleToScreen ( int target, const char[] name,
  * @noreturn
  */
 stock void qufnrTools_RemoveParticle ( int entityReference ) {
-    Entity entity = new Entity ( EntRefToEntIndex ( entityReference ) );
+    Entity entity = Entity ( EntRefToEntIndex ( entityReference ) );
 
     if ( entity.index && entity.index != INVALID_ENT_REFERENCE ) {
         entity.acceptInput ( "Stop" );

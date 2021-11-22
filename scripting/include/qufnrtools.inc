@@ -308,7 +308,7 @@ stock void qufnrTools_PrintHintText ( int client, const char[] format, any ... )
  * @param ...			포멧 파라메터 값
  * @noreturn
  */
-stock bool qufnrTools_PrintHintTextAll ( const char[] format, any ... ) {
+stock void qufnrTools_PrintHintTextAll ( const char[] format, any ... ) {
 	if ( GetEngineVersion () != Engine_CSGO ) {
 		LogError ( "'qufnrTools_PrintHintTextAll()' Function is not support on this engine." );
 		return;
@@ -358,7 +358,7 @@ stock void qufnrTools_PrintCenterText ( int client, const char[] format, any ...
  * @param ...			포멧 파라메터 값
  * @noreturn
  */
-stock bool qufnrTools_PrintCenterTextAll ( const char[] format, any ... ) {
+stock void qufnrTools_PrintCenterTextAll ( const char[] format, any ... ) {
 	if ( GetEngineVersion () != Engine_CSGO ) {
 		LogError ( "'qufnrTools_PrintCenterTextAll()' Function is not support on this engine." );
 		return;
@@ -454,20 +454,20 @@ stock void qufnrTools_ShowSyncHudTextAll ( Handle sync, const char[] format, any
  * @param message
  */
 stock void qufnrTools_PrintPanelText ( int client = -1, int duration, const char[] message, any ... ) {
-	Event message = CreateEvent ( "show_survival_respawn_status" );
-	if ( message != null ) {
+	Event textEvent = CreateEvent ( "show_survival_respawn_status" );
+	if ( textEvent != null ) {
 		static char szBuffer[512];
 		if ( client != -1 )
 			SetGlobalTransTarget ( client );
 		VFormat ( szBuffer, sizeof szBuffer, message, 4 );
-		message.SetString ( "loc_token", szBuffer );
-		message.SetInt ( "duration", duration );
-		message.SetInt ( "userid", -1 );
+		textEvent.SetString ( "loc_token", szBuffer );
+		textEvent.SetInt ( "duration", duration );
+		textEvent.SetInt ( "userid", -1 );
 		if ( client == -1 )
-			message.Fire ();
+			textEvent.Fire ();
 		else {
-			message.FireToClient ( client );
-			message.Cancel ();
+			textEvent.FireToClient ( client );
+			textEvent.Cancel ();
 		}
 	}
 }
