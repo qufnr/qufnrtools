@@ -129,17 +129,17 @@ enum __SolidFlags_t {
  */
 #define		VALID_ENTITY_IN_FOR(%1,%2)		( ( %2 = Entity ( %1 ) ) != INVALID_ENTITY )
 
-#include "include/qufnrTools/tracerayfilter"
-#include "include/qufnrTools/entity"
-#include "include/qufnrTools/weapon"
-#include "include/qufnrTools/player"
-#include "include/qufnrTools/particleeffect"
-#include "include/qufnrTools/timer"
-#include "include/qufnrTools/menu"
-#include "include/qufnrTools/csgo"
-#include "include/qufnrTools/float"
-#include "include/qufnrTools/string"
-#include "include/qufnrTools/vector"
+#include "qufnrTools/tracerayfilter"
+#include "qufnrTools/entity"
+#include "qufnrTools/weapon"
+#include "qufnrTools/player"
+#include "qufnrTools/particleeffect"
+#include "qufnrTools/timer"
+#include "qufnrTools/menu"
+#include "qufnrTools/csgo"
+#include "qufnrTools/float"
+#include "qufnrTools/string"
+#include "qufnrTools/vector"
 
 /**
  * 색깔을 포멧합니다.
