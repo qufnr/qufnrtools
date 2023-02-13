@@ -9,7 +9,7 @@
 #include <sdktools>
 #include <sdkhooks>
 
-#if defined __cstrike_include
+#if defined __cstrike_include_enable
 	#include <cstrike>
 #endif
 
@@ -142,7 +142,7 @@ enum __SolidFlags_t {
 #include "qufnrTools/particleeffect"
 #include "qufnrTools/timer"
 #include "qufnrTools/menu"
-#if defined __cstrike_include
+#if defined __cstrike_include_enable
 	#include "qufnrTools/csgo"
 #endif
 #include "qufnrTools/float"

@@ -444,7 +444,7 @@ stock int qufnrTools_GetWeaponAmmoMax ( int weapon = 0 ) {
 	return qufnrTools_GetAmmoMax ( iIndex );
 }
 
-#if defined __cstrike_include
+#if defined __cstrike_include_enable
 
 /**
  * 무기의 슬롯 위치를 구합니다.

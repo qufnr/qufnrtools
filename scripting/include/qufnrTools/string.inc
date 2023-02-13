@@ -40,7 +40,7 @@ stock void qufnrTools_NumberFormat ( int number, char[] buffer, int maxlen ) {
         Format ( buffer, maxlen, "-%s", buffer );
 }
 
-#if defined __cstrike_include
+#if defined __cstrike_include_enable
     /**
      * String to team index (CS:S, CS:GO Only)
      *

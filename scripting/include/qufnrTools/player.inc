@@ -382,7 +382,7 @@ methodmap Player < Entity {
 		ChangeClientTeam ( this.index, team );
 	}
 
-	#if defined __cstrike_include
+	#if defined __cstrike_include_enable
 		/**
 		 * 팀을 변경합니다.
 		 */
@@ -572,7 +572,7 @@ methodmap Player < Entity {
 		}
 	}
 
-	#if defined __cstrike_include
+	#if defined __cstrike_include_enable
 
 		/**
 		 * 어시스트 횟수를 반환합니다. (CS:GO Only)
@@ -669,7 +669,7 @@ methodmap Player < Entity {
 		GetClientModel ( this.index, model, maxlen );
 	}
 
-	#if defined __cstrike_include
+	#if defined __cstrike_include_enable
 
 		/**
 		 * 모델을 업데이트합니다. (CS:S, CS:GO Only)
