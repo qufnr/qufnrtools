@@ -3,9 +3,15 @@
 #endif
 #define	_qufnrtools_included
 
+// cstrike 모듈을 unload 하고싶다면 해당 define 을 주석처리 해주세요.
+#define __cstrike_include_enable
+
 #include <sdktools>
 #include <sdkhooks>
-#include <cstrike>
+
+#if defined __cstrike_include
+	#include <cstrike>
+#endif
 
 
 #define		MAX_ENTITIES	
@@ -136,7 +142,9 @@ enum __SolidFlags_t {
 #include "qufnrTools/particleeffect"
 #include "qufnrTools/timer"
 #include "qufnrTools/menu"
-#include "qufnrTools/csgo"
+#if defined __cstrike_include
+	#include "qufnrTools/csgo"
+#endif
 #include "qufnrTools/float"
 #include "qufnrTools/string"
 #include "qufnrTools/vector"

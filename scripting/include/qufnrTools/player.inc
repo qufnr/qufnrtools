@@ -382,19 +382,21 @@ methodmap Player < Entity {
 		ChangeClientTeam ( this.index, team );
 	}
 
-	/**
-	 * 팀을 변경합니다.
-	 */
-	public void switchTeam ( int team ) {
-		CS_SwitchTeam ( this.index, team );
-	}
+	#if defined __cstrike_include
+		/**
+		 * 팀을 변경합니다.
+		 */
+		public void switchTeam ( int team ) {
+			CS_SwitchTeam ( this.index, team );
+		}
 
-	/**
-	 * 스폰합니다.
-	 */
-	public void respawn () {
-		CS_RespawnPlayer ( this.index );
-	}
+		/**
+		 * 스폰합니다.
+		 */
+		public void respawn () {
+			CS_RespawnPlayer ( this.index );
+		}
+	#endif
 
 	///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 	//															Vector Functions
@@ -570,45 +572,49 @@ methodmap Player < Entity {
 		}
 	}
 
-	/**
-	 * 어시스트 횟수를 반환합니다. (CS:GO Only)
-	 */
-	property int assist {
-		public get () {
-			return CS_GetClientAssists ( this.index );
+	#if defined __cstrike_include
+
+		/**
+		 * 어시스트 횟수를 반환합니다. (CS:GO Only)
+		 */
+		property int assist {
+			public get () {
+				return CS_GetClientAssists ( this.index );
+			}
+
+			public set ( int param ) {
+				CS_SetClientAssists ( this.index, param );
+			}
 		}
 
-		public set ( int param ) {
-			CS_SetClientAssists ( this.index, param );
+		/**
+		 * 점수를 반환합니다. (CS:GO Only)
+		 */
+		property int contributionScore {
+			public get () {
+				return CS_GetClientContributionScore ( this.index );
+			}
+
+			public set ( int param ) {
+				CS_SetClientContributionScore ( this.index, param );
+			}
 		}
-	}
 
-	/**
-	 * 점수를 반환합니다. (CS:GO Only)
-	 */
-	property int contributionScore {
-		public get () {
-			return CS_GetClientContributionScore ( this.index );
+		/**
+		 * 클랜 태그를 반환합니다.
+		 */
+		public int getClanTag ( char[] buffer, int size ) {
+			return CS_GetClientClanTag ( this.index, buffer, size );
 		}
 
-		public set ( int param ) {
-			CS_SetClientContributionScore ( this.index, param );
+		/**
+		 * 클랜 태그를 설정합니다.
+		 */
+		public void setClanTag ( const char[] tag ) {
+			CS_SetClientClanTag ( this.index, tag );
 		}
-	}
-
-	/**
-	 * 클랜 태그를 반환합니다.
-	 */
-	public int getClanTag ( char[] buffer, int size ) {
-		return CS_GetClientClanTag ( this.index, buffer, size );
-	}
-
-	/**
-	 * 클랜 태그를 설정합니다.
-	 */
-	public void setClanTag ( const char[] tag ) {
-		CS_SetClientClanTag ( this.index, tag );
-	}
+	
+	#endif
 
 	/**
 	 * Returns the client's connection time in seconds.
@@ -663,12 +669,16 @@ methodmap Player < Entity {
 		GetClientModel ( this.index, model, maxlen );
 	}
 
-	/**
-	 * 모델을 업데이트합니다. (CS:S, CS:GO Only)
-	 */
-	public void updateModel () {
-		CS_UpdateClientModel ( this.index );
-	}
+	#if defined __cstrike_include
+
+		/**
+		 * 모델을 업데이트합니다. (CS:S, CS:GO Only)
+		 */
+		public void updateModel () {
+			CS_UpdateClientModel ( this.index );
+		}
+
+	#endif
 
 	/**
 	 * 손 모델을 설정합니다. (CS:GO, L4D2 Only) 

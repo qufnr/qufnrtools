@@ -1,3 +1,4 @@
+
 #define CS_SLOT_6	5
 
 static char WEAPON_NAME_ARRAY[55][3][64] = {
@@ -443,55 +444,59 @@ stock int qufnrTools_GetWeaponAmmoMax ( int weapon = 0 ) {
 	return qufnrTools_GetAmmoMax ( iIndex );
 }
 
+#if defined __cstrike_include
+
 /**
  * 무기의 슬롯 위치를 구합니다.
  * @param weapon
  * @return 무기 슬롯 값
  */
-stock int qufnrTools_GetWeaponSlot ( int weapon ) {
-	CSWeaponID idx = CS_ItemDefIndexToID ( GetEntProp ( weapon, Prop_Send, "m_iItemDefinitionIndex" ) );
-	if ( idx != CSWeapon_NONE ) {
-		if ( idx == CSWeapon_P228 || idx == CSWeapon_GLOCK ||
-			idx == CSWeapon_ELITE || idx == CSWeapon_USP ||
-			idx == CSWeapon_DEAGLE || idx == CSWeapon_TEC9 ||
-			idx == CSWeapon_HKP2000 || idx == CSWeapon_P250 ||
-			idx == CSWeapon_USP_SILENCER  || idx == CSWeapon_CZ75A ||
-			idx == CSWeapon_REVOLVER || idx == CSWeapon_FIVESEVEN )
-			return CS_SLOT_SECONDARY;
-		else if ( idx == CSWeapon_KNIFE_GG || idx == CSWeapon_KNIFE ||
-			idx == CSWeapon_KNIFE_T || idx == CSWeapon_KNIFE_GHOST ||
-			idx == CSWeapon_KNIFE_FLIP || idx == CSWeapon_KNIFE_GUT ||
-			idx == CSWeapon_KNIFE_KARAMBIT || idx == CSWeapon_KNIFE_M9_BAYONET ||
-			idx == CSWeapon_KNIFE_TATICAL || idx == CSWeapon_KNIFE_FALCHION ||
-			idx == CSWeapon_KNIFE_SURVIVAL_BOWIE || idx == CSWeapon_KNIFE_BUTTERFLY ||
-			idx == CSWeapon_KNIFE_PUSH || idx == CSWeapon_KNIFE_URSUS ||
-			idx == CSWeapon_KNIFE_GYPSY_JACKKNIFE || idx == CSWeapon_KNIFE_STILETTO ||
-			idx == CSWeapon_KNIFE_WIDOWMAKER || idx == CSWeapon_BAYONET ||
-			idx == CSWeapon_FISTS || idx == CSWeapon_MELEE ||
-			idx == CSWeapon_AXE || idx == CSWeapon_HAMMER ||
-			idx == CSWeapon_SPANNER )
-			return CS_SLOT_KNIFE;
-		else if ( idx == CSWeapon_MOLOTOV || idx == CSWeapon_DECOY ||
-			idx == CSWeapon_INCGRENADE || idx == CSWeapon_TAGGRENADE ||
-			idx == CSWeapon_FIREBOMB || idx == CSWeapon_DIVERSION ||
-			idx == CSWeapon_FRAGGRENADE || idx == CSWeapon_SNOWBALL ||
-			idx == CSWeapon_HEGRENADE || idx == CSWeapon_SMOKEGRENADE ||
-			idx == CSWeapon_FLASHBANG )
-			return CS_SLOT_GRENADE;
-		else if ( idx == CSWeapon_C4 || idx == CSWeapon_BREACHCHARGE ||
-			idx == CSWeapon_BUMPMINE )
-			return CS_SLOT_C4;
-		else if ( idx == CSWeapon_SHIELD || idx == CSWeapon_HEALTHSHOT )
-			return CS_SLOT_6;
-		else if ( idx == CSWeapon_KEVLAR || idx == CSWeapon_ASSAULTSUIT ||
-			idx == CSWeapon_NIGHTVISION || idx == CSWeapon_DEFUSER )
-			return -1;
-		else
-			return CS_SLOT_PRIMARY;
+	stock int qufnrTools_GetWeaponSlot ( int weapon ) {
+		CSWeaponID idx = CS_ItemDefIndexToID ( GetEntProp ( weapon, Prop_Send, "m_iItemDefinitionIndex" ) );
+		if ( idx != CSWeapon_NONE ) {
+			if ( idx == CSWeapon_P228 || idx == CSWeapon_GLOCK ||
+				idx == CSWeapon_ELITE || idx == CSWeapon_USP ||
+				idx == CSWeapon_DEAGLE || idx == CSWeapon_TEC9 ||
+				idx == CSWeapon_HKP2000 || idx == CSWeapon_P250 ||
+				idx == CSWeapon_USP_SILENCER  || idx == CSWeapon_CZ75A ||
+				idx == CSWeapon_REVOLVER || idx == CSWeapon_FIVESEVEN )
+				return CS_SLOT_SECONDARY;
+			else if ( idx == CSWeapon_KNIFE_GG || idx == CSWeapon_KNIFE ||
+				idx == CSWeapon_KNIFE_T || idx == CSWeapon_KNIFE_GHOST ||
+				idx == CSWeapon_KNIFE_FLIP || idx == CSWeapon_KNIFE_GUT ||
+				idx == CSWeapon_KNIFE_KARAMBIT || idx == CSWeapon_KNIFE_M9_BAYONET ||
+				idx == CSWeapon_KNIFE_TATICAL || idx == CSWeapon_KNIFE_FALCHION ||
+				idx == CSWeapon_KNIFE_SURVIVAL_BOWIE || idx == CSWeapon_KNIFE_BUTTERFLY ||
+				idx == CSWeapon_KNIFE_PUSH || idx == CSWeapon_KNIFE_URSUS ||
+				idx == CSWeapon_KNIFE_GYPSY_JACKKNIFE || idx == CSWeapon_KNIFE_STILETTO ||
+				idx == CSWeapon_KNIFE_WIDOWMAKER || idx == CSWeapon_BAYONET ||
+				idx == CSWeapon_FISTS || idx == CSWeapon_MELEE ||
+				idx == CSWeapon_AXE || idx == CSWeapon_HAMMER ||
+				idx == CSWeapon_SPANNER )
+				return CS_SLOT_KNIFE;
+			else if ( idx == CSWeapon_MOLOTOV || idx == CSWeapon_DECOY ||
+				idx == CSWeapon_INCGRENADE || idx == CSWeapon_TAGGRENADE ||
+				idx == CSWeapon_FIREBOMB || idx == CSWeapon_DIVERSION ||
+				idx == CSWeapon_FRAGGRENADE || idx == CSWeapon_SNOWBALL ||
+				idx == CSWeapon_HEGRENADE || idx == CSWeapon_SMOKEGRENADE ||
+				idx == CSWeapon_FLASHBANG )
+				return CS_SLOT_GRENADE;
+			else if ( idx == CSWeapon_C4 || idx == CSWeapon_BREACHCHARGE ||
+				idx == CSWeapon_BUMPMINE )
+				return CS_SLOT_C4;
+			else if ( idx == CSWeapon_SHIELD || idx == CSWeapon_HEALTHSHOT )
+				return CS_SLOT_6;
+			else if ( idx == CSWeapon_KEVLAR || idx == CSWeapon_ASSAULTSUIT ||
+				idx == CSWeapon_NIGHTVISION || idx == CSWeapon_DEFUSER )
+				return -1;
+			else
+				return CS_SLOT_PRIMARY;
+		}
+		
+		return -1;
 	}
-	
-	return -1;
-}
+
+#endif
 
 /**
  * 무기를 가지고 있는지 채크합니다.

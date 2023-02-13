@@ -40,17 +40,19 @@ stock void qufnrTools_NumberFormat ( int number, char[] buffer, int maxlen ) {
         Format ( buffer, maxlen, "-%s", buffer );
 }
 
-/**
- * String to team index (CS:S, CS:GO Only)
- *
- * @param str        Name of team string
- * @return CS_TEAM_*
- */
-stock int qufnrTools_StringToTeamIndex ( const char[] str ) {
-    if ( StrEqual ( str, "ct", false ) )        return CS_TEAM_CT;
-    else if ( StrEqual ( str, "t", false ) )    return CS_TEAM_T;
-    else    return CS_TEAM_NONE;
-}
+#if defined __cstrike_include
+    /**
+     * String to team index (CS:S, CS:GO Only)
+     *
+     * @param str        Name of team string
+     * @return CS_TEAM_*
+     */
+    stock int qufnrTools_StringToTeamIndex ( const char[] str ) {
+        if ( StrEqual ( str, "ct", false ) )        return CS_TEAM_CT;
+        else if ( StrEqual ( str, "t", false ) )    return CS_TEAM_T;
+        else    return CS_TEAM_NONE;
+    }
+#endif
 
 /**
  * 텍스트로 프로그레스 바를 그립니다.
