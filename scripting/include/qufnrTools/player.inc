@@ -1740,6 +1740,16 @@ stock bool qufnrTools_IsValidClient ( int client ) {
 			!IsClientReplay ( client ) );
 }
 
+/**
+ * 클라이언트가 유효하고 살아있는지 유무를 반환합니다.
+ * 
+ * @param client		Index of client.
+ * @return 클라이언트가 유효하고 살아있을 경우 true 를 반환합니다.
+ */
+stock bool qufnrTools_IsValidAliveClient ( int client ) {
+	return qufnrTools_IsValidClient ( client ) && IsPlayerAlive ( client );
+}
+
 /** 
  * Gets all players from in game
  * @return Player counts
@@ -1911,6 +1921,66 @@ stock int qufnrTools_GetClosestPlayer ( float center[3], int ignoreEntity = -1, 
 	}
 
 	return iClosestEntity;
+}
+
+/**
+ * 클라이언트의 이동 속도를 반환합니다.
+ * 
+ * @param client 클라이언트
+ * 
+ * @return 이동 속도 (기본값: 1.0)
+ */
+stock float qufnrTools_GetPlayerLaggedmovement ( int client ) {
+	return GetEntDataFloat ( client, FindSendPropInfo ( "CBasePlayer", "m_flLaggedMovementValue" ) );
+}
+
+/**
+ * 클라이언트의 이동 속도를 설정합니다.
+ * 
+ * @param client 클라이언트
+ * @param value 이동 속도 (기본값: 1.0)
+ */
+stock void qufnrTools_SetPlayerLaggedmovement ( int client, float value ) {
+	SetEntDataFloat ( client, FindSendPropInfo ( "CBasePlayer", "m_flLaggedMovementValue" ), value );
+}
+
+/**
+ * 플레이어의 수평 속도를 반환합니다.
+ * 
+ * @param client 클라이언트 (플레이어)
+ * 
+ * @return 수평 속도
+ */
+stock float qufnrTools_GetPlayerHorizontalSpeed ( int client ) {
+	float flVel[3];
+	GetEntPropVector ( client, Prop_Data, "m_vecVelocity", flVel );
+	return SquareRoot ( flVel[0] * flVel[0] + flVel[1] * flVel[1] );
+}
+
+/**
+ * 플레이어의 수직 속도를 반환합니다.
+ * 
+ * @param client 클라이언트 (플레이어)
+ * 
+ * @return 수직 속도
+ */
+stock float qufnrTools_GetPlayerVerticalSpeed ( int client ) {
+	float flVel[3];
+	GetEntPropVector ( client, Prop_Data, "m_vecVelocity", flVel );
+	return SquareRoot ( flVel[2] * flVel[2] );
+}
+
+/**
+ * 플레이어의 속도를 반환합니다.
+ * 
+ * @param client 클라이언트 (플레이어)
+ * 
+ * @return 속도
+ */
+stock float qufnrTools_GetVelocitySpeed ( int client ) {
+	float flVel[3];
+	GetEntPropVector ( client, Prop_Data, "m_vecVelocity", flVel );
+	return GetVectorLength ( flVel );
 }
 
 /**
